@@ -31,6 +31,8 @@ export default function App() {
   const [opponentGuess, setOpponentGuess] = useState(null);
   const wsRef = useRef(null);
   const timerRef = useRef(null);
+  const pendingMessages = useRef([]);  // queue messages sent before WS opens
+  const [connected, setConnected] = useState(false);
   const [showOpponentAction, setShowOpponentAction] = useState(false);
 
   // Connect WebSocket (only once, after leaving login screen)
@@ -38,6 +40,7 @@ export default function App() {
   useEffect(() => {
     if (screen === "login") {
       hasConnected.current = false;
+      setConnected(false);
       return;
     }
     if (hasConnected.current) return;
@@ -48,7 +51,13 @@ export default function App() {
 
     ws.onopen = () => {
       console.log("WS connected");
+      setConnected(true);
       ws.send(JSON.stringify({ type: "join", name }));
+      // Flush any queued messages (e.g., find_match that was clicked early)
+      for (const msg of pendingMessages.current) {
+        ws.send(msg);
+      }
+      pendingMessages.current = [];
     };
 
     ws.onmessage = (e) => {
@@ -134,8 +143,12 @@ export default function App() {
   }, [youAre]);
 
   const send = (type, data = {}) => {
+    const msg = JSON.stringify({ type, ...data });
     if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ type, ...data }));
+      wsRef.current.send(msg);
+    } else {
+      // Queue for when the connection opens
+      pendingMessages.current.push(msg);
     }
   };
 
@@ -222,8 +235,12 @@ export default function App() {
               </button>
             ))}
           </div>
-          <button className="btn primary" onClick={handleFindMatch}>
-            Find Opponent
+          <button
+            className={`btn primary ${!connected ? "connecting" : ""}`}
+            onClick={handleFindMatch}
+            disabled={!connected}
+          >
+            {connected ? "Find Opponent" : "Connecting..."}
           </button>
           {error && <p className="error">{error}</p>}
         </div>

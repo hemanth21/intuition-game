@@ -227,6 +227,17 @@ body {
   box-shadow: 0 2px 10px rgba(236, 28, 36, 0.3);
 }
 
+.btn.primary.connecting {
+  background: linear-gradient(135deg, #555, #444);
+  animation: pulse 1.2s ease-in-out infinite;
+  cursor: wait;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
 .btn.secondary {
   background: transparent;
   border: 2px solid var(--border);
