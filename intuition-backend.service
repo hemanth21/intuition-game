@@ -1,0 +1,27 @@
+# Intuition Game Backend — systemd service
+# Place at /etc/systemd/system/intuition-backend.service
+
+[Unit]
+Description=Intuition Game WebSocket Server
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/intuition-game/backend
+ExecStart=/usr/bin/python3 -m uvicorn main:app --host 0.0.0.0 --port 8765
+Restart=always
+RestartSec=5
+
+# Environment
+Environment="PYTHONUNBUFFERED=1"
+
+# Security hardening
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/ubuntu/intuition-game/backend
+
+[Install]
+WantedBy=multi-user.target
