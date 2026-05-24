@@ -33,9 +33,16 @@ export default function App() {
   const timerRef = useRef(null);
   const [showOpponentAction, setShowOpponentAction] = useState(false);
 
-  // Connect WebSocket
+  // Connect WebSocket (only once, after leaving login screen)
+  const hasConnected = useRef(false);
   useEffect(() => {
-    if (screen === "login") return;
+    if (screen === "login") {
+      hasConnected.current = false;
+      return;
+    }
+    if (hasConnected.current) return;
+    hasConnected.current = true;
+
     const ws = new WebSocket(WS_URL);
     wsRef.current = ws;
 
