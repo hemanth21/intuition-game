@@ -32,6 +32,7 @@ export default function App() {
   const wsRef = useRef(null);
   const timerRef = useRef(null);
   const pendingMessages = useRef([]);  // queue messages sent before WS opens
+  const youAreRef = useRef("");         // always-current value for WS handler
   const [connected, setConnected] = useState(false);
   const [showOpponentAction, setShowOpponentAction] = useState(false);
 
@@ -93,6 +94,11 @@ export default function App() {
     return () => clearInterval(timerRef.current);
   }, [screen, timeLeft]);
 
+  // Keep youAreRef in sync for the WebSocket handler (avoid stale closure)
+  useEffect(() => {
+    youAreRef.current = youAre;
+  }, [youAre]);
+
   const handleMessage = useCallback((msg) => {
     switch (msg.type) {
       case "joined":
@@ -126,7 +132,7 @@ export default function App() {
         setTimeout(() => setShowOpponentAction(false), 1500);
         break;
       case "turn_change":
-        setCurrentTurn(msg.your_turn ? youAre : "");
+        setCurrentTurn(msg.your_turn ? youAreRef.current : "");
         break;
       case "game_over":
         setResults(msg);
@@ -147,7 +153,7 @@ export default function App() {
       default:
         break;
     }
-  }, [youAre]);
+  }, []);
 
   const send = (type, data = {}) => {
     const msg = JSON.stringify({ type, ...data });
