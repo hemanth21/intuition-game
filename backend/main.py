@@ -291,14 +291,25 @@ async def websocket_endpoint(ws: WebSocket):
 # ── Serve React Frontend (production mode) ────────────────────
 
 FRONTEND_DIR = Path(__file__).parent.parent / "frontend" / "dist"
+logger.info(f"Frontend dir: {FRONTEND_DIR} (exists={FRONTEND_DIR.exists()})")
+
+@app.get("/")
+async def root():
+    """Explicit root route for the SPA."""
+    index = FRONTEND_DIR / "index.html"
+    if index.exists():
+        return FileResponse(str(index))
+    return FileResponse(str(FRONTEND_DIR / "index.html"))
 
 if FRONTEND_DIR.exists():
-    app.mount("/assets", StaticFiles(directory=FRONTEND_DIR / "assets"), name="assets")
+    assets_dir = FRONTEND_DIR / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
 
     @app.get("/{full_path:path}")
     async def serve_frontend(full_path: str):
         """Serve React SPA — all non-API routes go to index.html."""
-        if full_path.startswith("ws") or full_path.startswith("docs") or full_path.startswith("openapi"):
+        if full_path.startswith(("ws", "docs", "openapi")):
             from fastapi.responses import JSONResponse
             return JSONResponse({"detail": "Not Found"}, status_code=404)
         
