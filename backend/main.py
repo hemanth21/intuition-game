@@ -299,24 +299,25 @@ async def root():
     index = FRONTEND_DIR / "index.html"
     if index.exists():
         return FileResponse(str(index))
-    return FileResponse(str(FRONTEND_DIR / "index.html"))
+    return JSONResponse({"detail": "Frontend not built"}, status_code=404)
 
-if FRONTEND_DIR.exists():
-    assets_dir = FRONTEND_DIR / "assets"
-    if assets_dir.exists():
-        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
-
-    @app.get("/{full_path:path}")
-    async def serve_frontend(full_path: str):
-        """Serve React SPA — all non-API routes go to index.html."""
-        if full_path.startswith(("ws", "docs", "openapi")):
-            from fastapi.responses import JSONResponse
-            return JSONResponse({"detail": "Not Found"}, status_code=404)
-        
-        file_path = FRONTEND_DIR / full_path
-        if file_path.is_file():
-            return FileResponse(str(file_path))
-        return FileResponse(str(FRONTEND_DIR / "index.html"))
+# Catch-all: serve static files OR fall back to index.html (SPA)
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    """Serve any file from dist/, or fall back to index.html for SPA routing."""
+    # Skip API paths
+    if full_path.startswith(("ws", "docs", "openapi")):
+        return JSONResponse({"detail": "Not Found"}, status_code=404)
+    
+    file_path = FRONTEND_DIR / full_path
+    if file_path.exists() and file_path.is_file():
+        return FileResponse(str(file_path))
+    
+    # SPA fallback — serve index.html for all unknown routes
+    index = FRONTEND_DIR / "index.html"
+    if index.exists():
+        return FileResponse(str(index))
+    return JSONResponse({"detail": "Not Found"}, status_code=404)
 
 if __name__ == "__main__":
     import uvicorn
