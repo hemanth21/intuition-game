@@ -78,6 +78,22 @@ export default function App() {
     };
   }, []);
 
+  // Subtle background critters — panda & penguin outlines
+  useEffect(() => {
+    const div = document.createElement("div");
+    div.className = "bg-critters";
+    div.innerHTML = `
+      <span class="critter panda" style="top:8%;left:5%">🐼</span>
+      <span class="critter penguin" style="top:12%;right:8%">🐧</span>
+      <span class="critter panda" style="bottom:15%;left:12%">🐼</span>
+      <span class="critter penguin" style="bottom:10%;right:5%">🐧</span>
+      <span class="critter panda" style="top:45%;left:3%">🐼</span>
+      <span class="critter penguin" style="top:55%;right:3%">🐧</span>
+    `;
+    document.body.appendChild(div);
+    return () => div.remove();
+  }, []);
+
   // Timer countdown
   useEffect(() => {
     if (screen === "playing" && timeLeft > 0) {
@@ -207,7 +223,7 @@ export default function App() {
     return (
       <div className="container">
         <div className="card">
-          <h1>🧠 Intuition</h1>
+          <h1>🧠 Rapture Intuition</h1>
           <p className="subtitle">Can you read your opponent's mind?</p>
           <form onSubmit={handleLogin}>
             <input

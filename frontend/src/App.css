@@ -53,6 +53,38 @@ body {
   overflow-x: hidden;
 }
 
+/* ── Background Critters ───────────────────────────────────── */
+
+.bg-critters {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.critter {
+  position: absolute;
+  font-size: 4rem;
+  opacity: 0.05;
+  filter: grayscale(1) blur(1px);
+  animation: floatCritter 12s ease-in-out infinite;
+  user-select: none;
+}
+
+.critter:nth-child(2) { animation-delay: -3s; animation-duration: 14s; }
+.critter:nth-child(3) { animation-delay: -6s; animation-duration: 10s; }
+.critter:nth-child(4) { animation-delay: -1s; animation-duration: 15s; }
+.critter:nth-child(5) { animation-delay: -8s; animation-duration: 11s; }
+.critter:nth-child(6) { animation-delay: -4s; animation-duration: 13s; }
+
+@keyframes floatCritter {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-10px) rotate(3deg); }
+  50% { transform: translateY(5px) rotate(-2deg); }
+  75% { transform: translateY(-5px) rotate(1deg); }
+}
+
 /* ── Container ──────────────────────────────────────────────── */
 
 .container {
