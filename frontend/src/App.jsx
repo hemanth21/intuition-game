@@ -201,11 +201,6 @@ export default function App() {
     return (
       <div className="container">
         <div className="card">
-          <div className="team-badges">
-            <div className="team-badge rcb">RCB</div>
-            <div className="team-badge mi">MI</div>
-            <div className="team-badge csk">CSK</div>
-          </div>
           <h1>🧠 Intuition</h1>
           <p className="subtitle">Can you read your opponent's mind?</p>
           <form onSubmit={handleLogin}>
