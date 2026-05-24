@@ -35,7 +35,7 @@ export default function App() {
   const [connected, setConnected] = useState(false);
   const [showOpponentAction, setShowOpponentAction] = useState(false);
 
-  // Connect WebSocket (only once, after leaving login screen)
+  // Connect WebSocket ONCE per session — never close on screen changes
   const hasConnected = useRef(false);
   useEffect(() => {
     if (screen === "login") {
@@ -67,8 +67,15 @@ export default function App() {
 
     ws.onclose = () => setError("Connection lost. Refresh to reconnect.");
 
-    return () => ws.close();
+    // NO cleanup here — WebSocket stays alive across all screens
   }, [name, screen]);
+
+  // Close WebSocket only when component unmounts
+  useEffect(() => {
+    return () => {
+      wsRef.current?.close();
+    };
+  }, []);
 
   // Timer countdown
   useEffect(() => {
