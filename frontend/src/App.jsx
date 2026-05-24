@@ -223,7 +223,7 @@ export default function App() {
     return (
       <div className="container">
         <div className="card">
-          <h1>🧠 Rapture Intuition</h1>
+          <h1>🧠 Intuition</h1>
           <p className="subtitle">Can you read your opponent's mind?</p>
           <form onSubmit={handleLogin}>
             <input
