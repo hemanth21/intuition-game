@@ -52,7 +52,7 @@ export default function App() {
     ws.onclose = () => setError("Connection lost. Refresh to reconnect.");
 
     return () => ws.close();
-  }, [name]);
+  }, [name, screen]);
 
   // Timer countdown
   useEffect(() => {
